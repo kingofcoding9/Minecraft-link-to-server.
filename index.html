@@ -13,18 +13,19 @@
         .status { font-style: italic; margin-top: 20px; color: #99aab5; }
     </style>
     <script type="text/javascript">
-        // We'll try to launch Minecraft after a short delay (1 second).
-        // This gives the user time to see the manual instructions if they need them.
+        // This script will try to open Minecraft and add the server to the user's list.
         setTimeout(function() {
-            window.location.href = "minecraft://?joinServer=omni-science.bh-games.com&port=9075";
+            window.location.href = "minecraft://?addExternalServer=Omni-Science%20Server|omni-science.bh-games.com:9075";
         }, 1000);
     </script>
 </head>
 <body>
     <div class="container">
-        <h1>Joining Omni-Science Server</h1>
-        <p class="status">Your game should open automatically. If you are not connected to the server when it opens, please add it manually:</p>
+        <h1>Add the Omni-Science Server</h1>
+        <p class="status">Your game should open and ask to add the server. If not, please add it manually:</p>
         <div class="info">
+            <p><strong>Server Name:</strong></p>
+            <p class="address">Omni-Science Server</p>
             <p><strong>Server Address:</strong></p>
             <p class="address">omni-science.bh-games.com</p>
             <p><strong>Port:</strong></p>
