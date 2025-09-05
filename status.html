@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Status</title>
+    <style>
+        :root {
+            --bg-color: #2E3338;
+            --container-bg: #36393F;
+            --text-color: #DCDEE1;
+            --title-color: #FFFFFF;
+            --online-color: #23A559;
+            --offline-color: #F23F43;
+            --link-color: #5865F2;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 16px;
+        }
+        #status-container {
+            background-color: var(--container-bg);
+            border-left: 4px solid var(--offline-color);
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 500px;
+            margin: auto;
+        }
+        #status-container.online {
+            border-left-color: var(--online-color);
+        }
+        h2, h3 {
+            margin: 0;
+            padding: 0;
+            font-weight: 500;
+        }
+        h2 {
+            color: var(--title-color);
+            font-size: 1.2em;
+            margin-bottom: 16px;
+        }
+        h3 {
+            color: var(--title-color);
+            font-size: 1em;
+            margin-top: 16px;
+            border-top: 1px solid #40444B;
+            padding-top: 16px;
+        }
+        .server-block, .total-players, .join-link {
+            margin-bottom: 12px;
+        }
+        .status-dot {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-dot.online { background-color: var(--online-color); }
+        .status-dot.offline { background-color: var(--offline-color); }
+        .player-list {
+            list-style: none;
+            padding-left: 20px;
+            margin: 8px 0 0 0;
+            font-style: italic;
+            color: #B5BAC1;
+            font-size: 0.9em;
+        }
+        .join-link a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="status-container">
+    <h2>Loading Server Status...</h2>
+</div>
+
+<script>
+    // --- IMPORTANT: UPDATE THESE TWO URLS ---
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbx1J2ZYs7Rb0hAXC5HjKSY0Wjffi5BGBHlhOrlX64Hs4XH_D_BrrU5sLiIG9y6iYMvHxg/exec'; 
+    const JOIN_URL = 'https://kingofcoding9.github.io/Minecraft-link-to-server./'; // Example: Your GitHub join page URL
+    // ------------------------------------
+
+    const statusContainer = document.getElementById('status-container');
+
+    async function fetchStatus() {
+        try {
+            const response = await fetch(GAS_URL);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            updateDisplay(data);
+        } catch (error) {
+            statusContainer.innerHTML = '<h2>Could not load server status.</h2>';
+            console.error('Fetch error:', error);
+        }
+    }
+
+    function updateDisplay(data) {
+        statusContainer.className = data.totalPlayerCount > 0 ? 'online' : '';
+        
+        let html = `<h2>Omni-Science Network Status</h2>`;
+        html += `<div class="total-players">🌐 <strong>Total Players Online: ${data.totalPlayerCount}</strong></div>`;
+
+        data.servers.forEach(server => {
+            const isOnline = server.status === 'online';
+            html += `<div class="server-block">`;
+            html += `<h3><span class="status-dot ${isOnline ? 'online' : 'offline'}"></span>${server.serverName}</h3>`;
+            
+            if (isOnline) {
+                html += `<div>Online - ${server.playerCount} Players</div>`;
+                if (server.playerCount > 0) {
+                    html += `<ul class="player-list">`;
+                    server.playerNames.forEach((name, index) => {
+                        const coins = server.omniCoin[index] || 0;
+                        html += `<li>${name} - ${coins} Omni-Coins</li>`;
+                    });
+                    html += `</ul>`;
+                }
+            } else {
+                html += `<div>Offline</div>`;
+            }
+            html += `</div>`;
+        });
+        
+        html += `<div class="join-link"><h3><a href="${JOIN_URL}" target="_blank">Click Here to Join!</a></h3></div>`;
+
+        statusContainer.innerHTML = html;
+    }
+
+    // Fetch status immediately on page load, then every 60 seconds
+    fetchStatus();
+    setInterval(fetchStatus, 60000);
+</script>
+
+</body>
+</html>
